@@ -13,6 +13,44 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 .top-nav span{color:#aaa;font-size:10px;margin-left:5px}
 .pnav-btn{padding:4px 10px;background:transparent;color:#ccc;border:1px solid #444;border-radius:5px;cursor:pointer;font-size:11px;font-family:inherit;transition:all .2s}
 .pnav-btn:hover,.pnav-btn.active{background:var(--pl);color:white;border-color:var(--pl)}
+/* القائمة الجانبية: الشريط العلوي بقى نحيف (زر ☰ + اسم الصفحة الحالية) والتابات جوه درج جانبي */
+.top-nav{gap:10px}
+.nav-menu-btn{background:transparent;border:1px solid #556;color:#fff;border-radius:8px;font-size:20px;line-height:1;padding:4px 11px;cursor:pointer;font-family:inherit}
+.nav-menu-btn:hover{background:var(--pl);border-color:var(--pl)}
+.top-nav .nav-cur{color:#e8eef3;font-size:13px;margin:0}
+.nav-overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .22s;z-index:9998}
+.nav-overlay.open{opacity:1;pointer-events:auto}
+.nav-drawer{position:fixed;top:0;bottom:0;right:0;width:min(310px,86vw);background:#f4f5f1;box-shadow:-6px 0 24px rgba(0,0,0,.25);transform:translateX(105%);transition:transform .25s ease;z-index:9999;padding:14px 12px 20px;overflow-y:auto;direction:rtl}
+.nav-drawer.open{transform:none}
+.nav-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 12px;margin-bottom:8px;border-bottom:1px solid #dcdfd8;color:var(--p);font-size:15px}
+.nav-x{background:transparent;border:none;font-size:18px;cursor:pointer;color:#6c757d;padding:4px 8px;border-radius:6px}
+.nav-x:hover{background:#e3e6df}
+.nav-drawer .pnav-btn{display:block;width:100%;text-align:right;padding:13px 14px;font-size:14px;color:#2c3e50;background:transparent;border:none;border-radius:10px;margin-bottom:2px}
+.nav-drawer .pnav-btn:hover{background:#e6e9e2;color:var(--p)}
+.nav-drawer .pnav-btn.active{background:#dfe9f2;color:var(--p);font-weight:700}
+/* نتائج بحث آخر حدث: كروت مرتبة (الأزرار فوق على طول من غير سكرول أفقي) */
+#tbl_events{border:none;display:block;width:100%}
+#tbl_events thead{display:none}
+#tbl_events tbody,#tbl_events tr{display:block;width:100%}
+#tbl_events td.evc-td{display:block;padding:0;border:none;background:transparent}
+.evc{background:#fff;border:1px solid #dfe5ea;border-right:5px solid var(--p);border-radius:10px;padding:10px 12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.evc.done{border-right-color:#27ae60}
+.evc.urgent{border-right-color:#c0392b}
+.evc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.evc-title{font-size:14px;color:var(--p);flex:1 1 200px;min-width:0}
+.evc-btns{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.evc-btns .btn{padding:5px 11px;font-size:12px;text-decoration:none;white-space:nowrap}
+.evc-subject{margin:7px 0 6px;font-size:13px;font-weight:600;color:#2c3e50;line-height:1.6}
+.evc-meta{display:flex;gap:6px;flex-wrap:wrap;font-size:11px}
+.evc-chip{background:#f1f4f7;border-radius:12px;padding:2px 9px;color:#44515e}
+.evc-acts{margin-top:8px;background:#f6f9fb;border-radius:8px;padding:6px 10px;font-size:12px;line-height:1.7}
+.evc-foot{margin-top:6px;font-size:10px;color:var(--muted)}
+.evc-more{position:relative}
+.evc-more summary{cursor:pointer;list-style:none;padding:5px 10px;border:1px solid #cfd8de;border-radius:6px;font-size:12px;background:#fff;color:#44515e}
+.evc-more summary::-webkit-details-marker{display:none}
+.evc-more[open] summary{background:#eef3f7}
+.evc-more .evc-menu{position:absolute;left:0;top:calc(100% + 4px);z-index:20;background:#fff;border:1px solid #cfd8de;border-radius:8px;padding:6px;display:flex;flex-direction:column;gap:5px;min-width:220px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.evc-more .evc-menu .btn{width:100%;text-align:right}
 /* PAGES */
 .page{display:none;animation:fi .3s}
 .page.active{display:block}
@@ -202,13 +240,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
 <!-- Modal تعديل حدث (آخر حدث) -->
 <div id="eventEditModal" class="nov">
-  <div class="nbox" style="max-width:520px;width:95%;max-height:88vh;overflow-y:auto">
+  <div class="nbox" id="evEditBox" style="max-width:520px;width:95%;max-height:88vh;overflow-y:auto">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <h3 style="color:var(--p);font-size:16px">✏️ تعديل الحدث</h3>
+      <h3 style="color:var(--p);font-size:16px" id="evEditTitle">✏️ تعديل الحدث</h3>
       <button onclick="closeEventEditModal()" style="padding:6px 12px;background:var(--d);color:white;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:11px">✕ إغلاق</button>
     </div>
     <div id="evEditFixedDataBtnWrap" style="margin-bottom:10px"></div>
-    <div class="fg2">
+    <div id="evEdit_summary" style="display:none"></div>
+    <div class="fg2" id="evEdit_mainFields">
       <div class="fg full"><label class="lbl">الموضوع</label>
         <input class="fc" id="evEdit_subject"></div>
       <div class="fg"><label class="lbl">النوع</label>
@@ -239,7 +278,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
         <div id="evEdit_adminDataSlot"></div>
         <div id="evEditAdminPickerWrap"></div>
         <div id="evEditAdminDataWrap"></div>
-        <div style="font-size:11px;color:var(--muted);font-weight:600;margin:12px 0 4px">الإجراء</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 4px">
+          <span style="font-size:11px;color:var(--muted);font-weight:600">الإجراء</span>
+          <button type="button" class="btn btn-s" style="padding:3px 10px;font-size:11px" title="ارفعي خطاب الصادر (Word) والخانات تتملي منه" onclick="document.getElementById('evEdit_actFileInp').click()">📄 املي من ملف Word</button>
+          <input type="file" id="evEdit_actFileInp" accept=".docx,.txt" style="display:none" onchange="evActFromFile(this)">
+        </div>
         <div id="evEdit_actions_container"></div>
         <button type="button" class="btn btn-s" style="margin-top:8px;padding:5px 14px;font-size:12px" onclick="addActionRow('evEdit')">+ إضافة إجراء آخر</button>
       </div>
@@ -268,7 +311,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
     </div>
     <div id="evEdit_msg" style="font-size:12px;margin:6px 0"></div>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btn-p" onclick="saveEventEdit()" style="flex:1">💾 حفظ التعديل</button>
+      <button class="btn btn-p" id="evEditSaveBtn" onclick="saveEventEdit()" style="flex:1">💾 حفظ التعديل</button>
       <button class="btn btn-s" onclick="closeEventEditModal()">إلغاء</button>
     </div>
   </div>
@@ -325,20 +368,25 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
 <!-- شريط التنقل -->
 <div class="top-nav">
-  <span>📌</span>
-  <button class="pnav-btn active" onclick="goPage('home')">🏠 الرئيسية</button>
-  <button class="pnav-btn" onclick="goPage('login')">🔑 تسجيل الدخول</button>
-  <button class="pnav-btn" onclick="auth('entry-choice')">📝 الإدخال</button>
-  <button class="pnav-btn" onclick="auth('entry-org')">🏢 بيانات الجمعية</button>
-  <button class="pnav-btn" onclick="auth('entry-event')">📅 آخر حدث</button>
-  <button class="pnav-btn" onclick="auth('search')">🔍 البحث</button>
-  <button class="pnav-btn" onclick="auth('stats')">📊 الإحصاء</button>
-  <button class="pnav-btn" onclick="auth('edit')">✏️ التعديل</button>
-  <button class="pnav-btn" onclick="auth('columns')">⚙️ الأعمدة</button>
-  <button class="pnav-btn" id="navOrgTransfer" style="display:none" onclick="auth('org-transfer')">🔀 نقل البيانات</button>
-  <button class="pnav-btn" onclick="goPage('add-org-guest')">📨 إرسال طلب تسجيل جمعية جديدة</button>
-  <button class="pnav-btn" onclick="goPage('my-requests-guest')">📨 طلباتي (بدون تسجيل دخول)</button>
-  <button class="pnav-btn" onclick="auth('admin-other')">🗂️ بيانات إدارية أخرى</button>
+  <button type="button" class="nav-menu-btn" id="navMenuBtn" aria-label="القائمة" onclick="navDrawerToggle()">☰</button>
+  <span class="nav-cur" id="navCurLabel">🏠 الرئيسية</span>
+  <div class="nav-overlay" id="navOverlay" onclick="navDrawerClose()"></div>
+  <nav class="nav-drawer" id="navDrawer" aria-label="القائمة الجانبية">
+    <div class="nav-drawer-head"><strong>📌 القائمة</strong><button type="button" class="nav-x" onclick="navDrawerClose()" aria-label="إغلاق">✕</button></div>
+    <button class="pnav-btn active" onclick="goPage('home')">🏠 الرئيسية</button>
+    <button class="pnav-btn" onclick="goPage('login')">🔑 تسجيل الدخول</button>
+    <button class="pnav-btn" onclick="auth('entry-choice')">📝 الإدخال</button>
+    <button class="pnav-btn" onclick="auth('entry-org')">🏢 بيانات الجمعية</button>
+    <button class="pnav-btn" onclick="auth('entry-event')">📅 آخر حدث</button>
+    <button class="pnav-btn" onclick="auth('search')">🔍 البحث</button>
+    <button class="pnav-btn" onclick="auth('stats')">📊 الإحصاء</button>
+    <button class="pnav-btn" onclick="auth('edit')">✏️ التعديل</button>
+    <button class="pnav-btn" onclick="auth('columns')">⚙️ الأعمدة</button>
+    <button class="pnav-btn" id="navOrgTransfer" style="display:none" onclick="auth('org-transfer')">🔀 نقل البيانات</button>
+    <button class="pnav-btn" onclick="goPage('add-org-guest')">📨 إرسال طلب تسجيل جمعية جديدة</button>
+    <button class="pnav-btn" onclick="goPage('my-requests-guest')">📨 طلباتي (بدون تسجيل دخول)</button>
+    <button class="pnav-btn" onclick="auth('admin-other')">🗂️ بيانات إدارية أخرى</button>
+  </nav>
 </div>
 
 <!-- ═══════════════════════════════ HOME ═══════════════════════════════ -->
@@ -732,30 +780,38 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
       <div class="step" id="evstp5">٥. تسجيل آخر حدث</div>
     </div>
 
-    <!-- EV-S1: بحث سريع (بناءً على طلب المستخدمة - سطر واحد مضغوط، مش إجباري خالص) -->
-    <div id="evs1">
-      <div class="card">
-        <h2 class="card-title">⚡ تسجيل سريع - جمعية (اختياري)</h2>
-        <div class="al al-i" style="font-size:11px">💡 اكتبي رقم القيد وسنته والمديرية (أو "مركزي") واسم الجمعية لو الحدث خاص بجمعية معيّنة - أو سيبيهم فاضيين وانزلي على طول لخانات التسجيل تحت، وهيتسجل كـ"حدث جهة أخرى".</div>
-        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:10px">
-          <div class="fg" style="width:110px;flex:0 0 auto">
-            <label class="lbl">رقم القيد</label>
-            <input class="fc" id="evs_reg" placeholder="رقم القيد" oninput="evQuickCheck()" onkeydown="if(event.key==='Enter'){event.preventDefault();evQuickPickFirstMatch();}">
-          </div>
-          <div class="fg" style="width:90px;flex:0 0 auto">
-            <label class="lbl">سنة القيد</label>
-            <select class="fc" id="evs_year" onchange="evQuickCheck()"><option value="">السنة</option></select>
-          </div>
-          <div class="fg" style="width:170px;flex:0 0 auto">
-            <label class="lbl">المديرية <span style="font-size:10px;color:var(--muted)">(أو مركزي)</span></label>
-            <input class="fc" id="evs_dir" list="evQuickDirList" placeholder="اكتبي أو اختاري..." oninput="evQuickCheck()" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('evs_name')?.focus();}">
-            <datalist id="evQuickDirList"></datalist>
-          </div>
-          <div class="fg" style="flex:1;min-width:180px">
-            <label class="lbl">اسم الجمعية</label>
-            <input class="fc" id="evs_name" placeholder="اسم الجمعية..." oninput="evQuickCheck()" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('ev_inDate')?.focus();}">
+    <!-- (جديد) الصف الأول للمسجِّل: التاريخ ← رقم الوارد ← النوع ← الجهة (نفس الـ IDs القديمة بالظبط) -->
+    <style>#ev_deptRow .al{margin:0;padding:5px 10px;font-size:12px}#ev_mainBlock .fg{margin-bottom:0}#ev_mainBlock input[readonly]{background:#f0f4f8;color:var(--muted)}</style>
+    <div class="card" id="ev_mainBlock">
+      <div id="ev_deptRow" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--p);padding-bottom:8px;margin-bottom:12px">
+        <h2 class="card-title" id="evAdminTitle" style="margin:0;border:0;padding:0;flex:1 1 auto;min-width:160px">📅 تسجيل وارد</h2>
+        <div id="evWorkDeptQuickSwitch" style="display:none"></div>
+        <div id="evDeptPickerWrap" style="display:none"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <label class="lbl req" style="margin:0">الإدارة</label>
+          <select class="fc" id="evDeptPicker" style="width:190px" onchange="goEvStep(5);evMaybeSetWorkDeptDefault()"><option value="">اختر الإدارة...</option></select>
+          <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);cursor:pointer"><input type="checkbox" id="evMakeDeptDefault" onchange="evMaybeSetWorkDeptDefault()"> إدارة عملي (متسألنيش تاني)</label>
+        </div></div>
+      </div>
+      <div id="ev_topFieldsWrap"></div>
+
+    <!-- EV-S1: الجمعية (اسم أو رقم قيد) - جزء من البلوك الواحد -->
+    <div id="evs1" style="margin-top:12px">
+      <div>
+        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+          <div class="fg" style="flex:1 1 280px;min-width:220px">
+            <label class="lbl">🏢 اسم الجمعية أو رقم القيد <span style="font-size:10px;color:var(--muted)">(اختياري - لو سيبتيه فاضي يتسجّل "جهة أخرى")</span></label>
+            <input class="fc" id="ev_orgQuery" placeholder="مثال: مؤسسة نور  أو  1234" autocomplete="off" oninput="evOrgQueryInput()" onkeydown="evOrgQueryKey(event)">
           </div>
           <button class="btn btn-s" id="evQuickResetBtn" style="display:none;flex:0 0 auto;padding:9px 12px" onclick="evQuickReset()">↩️ استعادة</button>
+        </div>
+        <!-- بتتملى تلقائي من الجمعية (أو من اللي اتكتب فوق)، ولو الجمعية جديدة تقدري تكمّليها هنا -->
+        <div id="ev_orgAutoRow" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:6px;font-size:11px;color:var(--muted)">
+          <span>⚙️ تلقائي:</span>
+          <input class="fc" id="evs_reg" data-nav-skip="1" style="width:100px;padding:5px 8px;font-size:12px" placeholder="رقم القيد" oninput="evQuickCheck()">
+          <select class="fc" id="evs_year" data-nav-skip="1" style="width:84px;padding:5px 6px;font-size:12px" onchange="evQuickCheck()"><option value="">السنة</option></select>
+          <input class="fc" id="evs_dir" data-nav-skip="1" list="evQuickDirList" style="width:150px;padding:5px 8px;font-size:12px" placeholder="المديرية / مركزي" oninput="evQuickCheck()">
+          <datalist id="evQuickDirList"></datalist>
+          <div style="display:none"><input id="evs_name" oninput="evQuickCheck()"></div>
         </div>
         <div id="evSearchBox" style="margin-top:10px"></div>
         <div id="evSearchList" style="margin-top:8px"></div>
@@ -774,10 +830,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
       </div>
     </div>
 
-
     <!-- EV-S2: بيانات ثابتة (عرض فقط، نفس بيانات الجمعية المختارة) -->
     <div id="evs2" style="display:none">
-      <div class="card">
+      <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
         <div id="evSelOrgBanner"></div>
         <details id="evMoreDataAccordion" style="margin-top:8px">
           <summary style="cursor:pointer;font-weight:600;color:var(--p);font-size:13px;padding:6px 0">▸ باقي بيانات الجمعية (اختياري - العنوان، رئيس المجلس، المستندات، الأسئلة الإلزامية...)</summary>
@@ -862,27 +917,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
     <!-- EV-S5: تسجيل آخر حدث (المختلفة) -->
     <div id="evs5" style="display:none">
-      <div class="card">
-        <div id="evSelOrgBanner2"></div>
-        <h2 class="card-title" id="evAdminTitle">📅 تسجيل آخر حدث</h2>
-
-        <!-- (جديد) يظهر بس لمستخدم "كل الإدارات"/مدير - عشان يختار هو بنفسه الإدارة اللي هيسجل بياناتها -->
-        <div id="evDeptPickerWrap" style="display:none">
-          <div class="al al-w">👤 اختر الإدارة اللي عايز تسجّل بياناتها آخر حدث لها:</div>
-          <div class="fg" style="margin-bottom:12px">
-            <label class="lbl req">الإدارة</label>
-            <select class="fc" id="evDeptPicker" onchange="goEvStep(5);evMaybeSetWorkDeptDefault()">
-              <option value="">اختر الإدارة...</option>
-            </select>
-          </div>
-          <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-bottom:12px">
-            <input type="checkbox" id="evMakeDeptDefault" onchange="evMaybeSetWorkDeptDefault()"> اجعليها إدارة عملي الافتراضية (متسألنيش تاني)
-          </label>
-        </div>
-        <!-- (جديد) بديل مختصر لمستخدمي "كل الإدارات" اللي حددوا إدارة عمل افتراضية عند
-             الدخول - بيوفر عليهم اختيار الإدارة في كل مرة يسجلوا فيها حدث -->
-        <div id="evWorkDeptQuickSwitch" style="display:none"></div>
-
+      <div style="margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)">
+        <div id="evSelOrgBanner2" style="display:none"></div>
         <!-- نموذج عادي لكل الإدارات عدا القيد -->
         <div id="evNormalForm">
           <input type="hidden" id="ev_autodate">
@@ -890,11 +926,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
           <!-- (تعديل - طلب ترتيب جديد) البيانات الإدارية بقت تظهر على طول بعد قسم "الإجراء"
                مباشرة (بدل ما تكون أول حاجة) - نفس الحاوية بالظبط ونفس الربط الحقيقي بجدول
                البيانات الإدارية زي ما هو، غيّرنا بس مكانها في الصفحة. -->
-          <div id="evAdminPickerWrap"></div>
-          <div id="evAdminDataWrap"></div>
+          <div id="evAdminPickerWrap" style="display:none"></div>
+          <div id="evAdminDataWrap" style="display:none"></div>
           <!-- اختيار "حدث موجود بالفعل" لنفس الجمعية/الإدارة - تكملي عليه بدل ما تسجّلي
                حدثًا مكررًا من الصفر -->
-          <div id="evEventPickerWrap"></div>
+          <div id="evEventPickerWrap" style="display:none"></div>
         </div>
 
 
@@ -975,6 +1011,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
         </div>
       </div>
     </div>
+    </div><!-- /ev_mainBlock -->
   </div>
 </div>
 
@@ -994,7 +1031,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
 
     <!-- فلاتر مشتركة -->
     <div class="card" id="sharedSearchFilters" style="margin-bottom:14px">
-      <div class="fg4">
+      <details id="sharedFiltersDetails"><summary style="cursor:pointer;font-size:13px;color:var(--p);font-weight:600">🔎 فلاتر الجمعية (نوع الكيان، المستوى، رقم القيد، المحافظة، الاسم) + تصدير</summary>
+      <div class="fg4" style="margin-top:10px">
         <div class="fg"><label class="lbl">نوع الكيان</label>
           <select class="fc" id="srch_type"><option value="">الكل</option><option>جمعية</option><option>مؤسسة</option><option>اتحاد</option></select></div>
         <div class="fg"><label class="lbl">المستوى</label>
@@ -1017,6 +1055,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
         <button class="btn btn-g" onclick="exportSearchExcel()">📥 تصدير Excel</button>
         <button class="btn btn-s" onclick="downloadSearchPDF()">📄 تنزيل Word</button>
       </div>
+      </details>
     </div>
 
     <!-- ── تبويب 1: آخر حدث ── -->
@@ -1038,12 +1077,20 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
             <input type="checkbox" id="srch_needsOrgInfo" onchange="doSearch()"> 🔁 جمعيات تحتاج معرفة بياناتها فقط
           </label>
         </div>
-        <!-- فلاتر إضافية لآخر حدث -->
-        <div class="fg2" style="margin-bottom:12px">
+        <!-- فلاتر آخر حدث: الأساسية ظاهرة، والباقي (تواريخ/إدارة/نوع...) في "فلاتر متقدمة" -->
+        <div class="fg4" style="margin-bottom:8px">
           <div class="fg"><label class="lbl">اسم المرسل</label>
             <input class="fc" id="srch_sender" placeholder="اسم المرسل / الجهة..." oninput="doSearch()"></div>
           <div class="fg"><label class="lbl">رقم الوارد</label>
             <input class="fc" id="srch_inNum" placeholder="رقم الوارد..." oninput="doSearch()"></div>
+          <div class="fg"><label class="lbl">الموضوع</label>
+            <input class="fc" id="srch_subject" placeholder="ابحث في الموضوع..." oninput="doSearch()"></div>
+          <div class="fg"><label class="lbl">المستلم</label>
+            <input class="fc" id="srch_receiver" placeholder="اسم المستلم..." oninput="doSearch()"></div>
+        </div>
+        <details id="srch_advDetails" style="margin-bottom:10px">
+          <summary style="cursor:pointer;font-size:12px;color:var(--p);padding:4px 0">🔎 فلاتر متقدمة (التواريخ، الإدارة، النوع، رقم الصادر، تاريخ التسجيل)</summary>
+          <div class="fg2" style="margin-top:8px">
           <div class="fg"><label class="lbl">رقم الصادر</label>
             <input class="fc" id="srch_outNum" placeholder="رقم الصادر..." oninput="doSearch()"></div>
           <div class="fg"><label class="lbl">من تاريخ</label>
@@ -1061,17 +1108,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--te
               <option value="">الكل</option>
               <option>خطاب</option><option>قرار</option><option>مذكرة</option><option>تقرير</option><option>طلب</option>
             </select></div>
-          <div class="fg"><label class="lbl">الموضوع</label>
-            <input class="fc" id="srch_subject" placeholder="ابحث في الموضوع..." oninput="doSearch()"></div>
-          <div class="fg"><label class="lbl">المستلم</label>
-            <input class="fc" id="srch_receiver" placeholder="اسم المستلم..." oninput="doSearch()"></div>
           <div class="fg"><label class="lbl">تاريخ التسجيل من</label>
             <input type="date" class="fc" id="srch_createdFrom" onchange="doSearch()"></div>
           <div class="fg"><label class="lbl">تاريخ التسجيل إلى</label>
             <input type="date" class="fc" id="srch_createdTo" onchange="doSearch()"></div>
           <div class="fg"><label class="lbl">يوم تسجيل محدد</label>
             <input type="date" class="fc" id="srch_createdDay" onchange="doSearch()"></div>
-        </div>
+          </div>
+        </details>
         <div id="srch_evBreakdown" style="font-size:11px;color:var(--muted);margin-bottom:10px"></div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
           <h3 style="color:var(--p)">نتائج آخر حدث</h3>
@@ -3406,6 +3450,16 @@ const REPORT_NOTIF_MAX_SHOWS=2; // التنبيه يظهر مرتين فقط ل�
 // ════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════
+// القائمة الجانبية (بتفتح بزر ☰ وبتتقفل بالضغط على أي تاب أو برا الدرج أو Esc)
+function navDrawerOpen(){ document.getElementById('navDrawer')?.classList.add('open'); document.getElementById('navOverlay')?.classList.add('open'); }
+function navDrawerClose(){ document.getElementById('navDrawer')?.classList.remove('open'); document.getElementById('navOverlay')?.classList.remove('open'); }
+function navDrawerToggle(){ document.getElementById('navDrawer')?.classList.contains('open') ? navDrawerClose() : navDrawerOpen(); }
+function navUpdateLabel(){
+  const a=document.querySelector('.nav-drawer .pnav-btn.active'), l=document.getElementById('navCurLabel');
+  if(a && l) l.textContent=a.textContent.trim();
+}
+document.addEventListener('click',function(e){ if(e.target.closest && e.target.closest('.nav-drawer .pnav-btn')) setTimeout(navDrawerClose,0); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') navDrawerClose(); });
 function goPage(p){
   document.querySelectorAll('.page').forEach(e=>e.classList.remove('active'));
   document.querySelectorAll('.pnav-btn').forEach(b=>b.classList.remove('active'));
@@ -3414,6 +3468,7 @@ function goPage(p){
   const map={home:0,login:1,'entry-choice':2,'entry-org':3,'entry-event':4,search:5,stats:6,edit:7,columns:8,'add-req':9,'doc-manager':10,'other-party':11,'requests':12,'reports-upload':13};
   const btns=document.querySelectorAll('.pnav-btn');
   if(map[p]!==undefined)btns[map[p]]?.classList.add('active');
+  navUpdateLabel();
   updateUBars();
   updateNavRequestsVisibility();
   if(p==='stats'){
@@ -6467,42 +6522,48 @@ function evQuickCheck(){
   const box=document.getElementById('evSearchBox');
   const list=document.getElementById('evSearchList');
   if(!rn&&!nm){ box.innerHTML=''; list.innerHTML=''; evHideNewOrgAccordion(); return; }
-  const pickBtn=(o,label)=>`<button type="button" class="btn btn-p" style="padding:5px 12px;font-size:12px;margin-top:6px" onclick="evQuickPickOrg(${o.OrgID})">📝 ${label} (${escapeHtml(o.n)})</button>`;
-  let regHtml='';
-  // (إصلاح باج) كانت بتختفي بمجرد ما رقم القيد يبقى فاضي، حتى لو الاسم لسه مكتوب فيه -
-  // يعني لو الشخص بيكتب الاسم الأول قبل رقم القيد، القسم كان بيختفي غلط. دلوقتي بنخفيها
-  // بس لو الاتنين (رقم القيد والاسم) فاضيين مع بعض.
-  if(!rn && !nm) evHideNewOrgAccordion();
-  else if(!rn && nm) evShowNewOrgAccordion();
+  // (إعادة بناء) بحث سريع نضيف: قائمة واحدة مرتبة بدل ما يظهر أول رقم/جمعية وتحته نتائج تانية.
+  //  • رقم قيد: المطابق بالظبط بس (ولو مفيش، أرقام قريبة بتبدأ بنفس الرقم - بحد أقصى 4، موضّحة إنها قريبة)
+  //  • اسم: اللي بيبدأ بالاسم الأول، وبعدين اللي فيه الاسم - بحد أقصى 6
+  //  • لو الاتنين: لازم يتطابقوا مع بعض. لو المديرية متحددة بيتقيّد بيها.
+  const yrSel=(document.getElementById('evs_year')?.value||'').trim();
+  let pool=ORGS_ADMIN.filter(o=>!o.mergedInto);
+  if(level) pool=pool.filter(o=>o.lv===level && (level==='مركزي'||o.g===gov));
+  if(nm.length>=2) pool=pool.filter(o=>o.n.toLowerCase().includes(nmLc));
+  let exact=[], near=[];
   if(rn){
-    const centralDup=ORGS_ADMIN.find(o=>o.r===rn && o.lv==='مركزي' && !o.mergedInto);
-    const dirDup = (level==='مديرية' && gov) ? ORGS_ADMIN.find(o=>o.r===rn && o.lv==='مديرية' && o.g===gov && !o.mergedInto) : null;
-    if(dirDup){
-      regHtml=`<div class="found-box">✅ رقم القيد ده مسجَّل في ${escapeHtml(gov)}: <strong>${escapeHtml(dirDup.n)}</strong>${pickBtn(dirDup,'سجّلي عليها')}</div>`;
-      evHideNewOrgAccordion();
-    } else if(level==='مركزي' && centralDup){
-      regHtml=`<div class="found-box">✅ رقم القيد ده مسجَّل مركزي: <strong>${escapeHtml(centralDup.n)}</strong>${pickBtn(centralDup,'سجّلي عليها')}</div>`;
-      evHideNewOrgAccordion();
-    } else if(level){
-      regHtml=`<div class="al al-s" style="font-size:11px">✅ الرقم ده غير مكرر في ${level==='مركزي'?'المركزي':('مديرية '+escapeHtml(gov))} - جمعية جديدة.${centralDup?(' (للعلم: مسجَّل مركزي أيضاً كـ'+escapeHtml(centralDup.n)+')'):''}<br>${nm?'✅ الاسم مكتوب - اضغطي Enter وانزلي لخانات التسجيل تحت.':'⚠️ اكتبي "اسم الجمعية" فوق (إجباري) عشان تقدري تكملي.'}</div>`;
-      evShowNewOrgAccordion();
-    } else {
-      regHtml='<div class="al al-w" style="font-size:11px">⚠️ حددي "المديرية" (أو اكتبي "مركزي") فوق عشان نقدر نتأكد إن رقم القيد ده غير مكرر.</div>';
-    }
+    exact=pool.filter(o=>String(o.r)===rn && (!yrSel || String(o.y)===yrSel));
+    if(!exact.length && rn.length>=2) near=pool.filter(o=>String(o.r).startsWith(rn)).slice(0,4);
+  } else if(nm.length>=2){
+    const starts=pool.filter(o=>o.n.toLowerCase().startsWith(nmLc));
+    const others=pool.filter(o=>!o.n.toLowerCase().startsWith(nmLc));
+    exact=starts.concat(others).slice(0,6);
   }
-  box.innerHTML=regHtml;
-  if(nm.length>=2){
-    let matches=ORGS_ADMIN.filter(o=>!o.mergedInto && o.n.toLowerCase().includes(nmLc));
-    if(level) matches=matches.filter(o=>o.lv===level && (level==='مركزي'||o.g===gov));
-    matches=matches.slice(0,5);
-    list.innerHTML = matches.map(o=>`
-      <div class="orow" onclick="evQuickPickOrg(${o.OrgID})">
-        <div><strong>${escapeHtml(o.n)}</strong><span style="display:block;margin-top:2px">${o.t} | ${o.r}/${o.y} | ${o.g||'مركزي'}</span></div>
-        <div><span class="badge ${o.lv==='مركزي'?'b-g':'b-b'}">${o.lv}</span><button class="btn btn-p" style="padding:3px 9px;font-size:10px;margin-right:6px">اختر</button></div>
-      </div>`).join('');
+  const row=(o,tag)=>`
+    <div class="orow" onclick="evQuickPickOrg(${o.OrgID})">
+      <div><strong>${escapeHtml(o.n)}</strong>${tag?`<span class="badge b-g" style="margin-right:6px;font-size:10px">${tag}</span>`:''}<span style="display:block;margin-top:2px">${o.t} | ${o.r}/${o.y} | ${o.g||'مركزي'}</span></div>
+      <div><span class="badge ${o.lv==='مركزي'?'b-g':'b-b'}">${o.lv}</span><button type="button" class="btn btn-p" style="padding:3px 9px;font-size:10px;margin-right:6px">اختر</button></div>
+    </div>`;
+  let html='';
+  if(exact.length) html+=exact.map(o=>row(o,rn?'✅ رقم القيد مطابق':'')).join('');
+  if(near.length) html+=`<div style="font-size:11px;color:var(--muted);margin:6px 0 2px">مفيش رقم قيد مطابق بالظبط - أرقام قريبة:</div>`+near.map(o=>row(o,'')).join('');
+  window._evQuickTopId = (exact.length===1 && (rn||nm.length>=2)) ? exact[0].OrgID : null;
+  if(exact.length){
+    evHideNewOrgAccordion();
+    html+=`<div style="font-size:11px;margin-top:6px"><a href="javascript:void(0)" onclick="evShowNewOrgAccordion()">➕ مش دي؟ سجّلي جمعية جديدة</a></div>`;
+    box.innerHTML='';
   } else {
-    list.innerHTML='';
+    let regHtml='';
+    if(rn){
+      if(level) regHtml=`<div class="al al-s" style="font-size:11px">✅ رقم القيد ده غير مسجَّل في ${level==='مركزي'?'المركزي':('مديرية '+escapeHtml(gov))} - جمعية جديدة.</div>`;
+      else regHtml='<div class="al al-w" style="font-size:11px">⚠️ مفيش جمعية بالرقم ده. حددي "المديرية" (أو اكتبي "مركزي") لو عايزة تسجّليها جديدة.</div>';
+    } else if(nm.length>=2){
+      regHtml='<div class="al al-i" style="font-size:11px">مفيش جمعية بالاسم ده - ممكن تسجّليها جديدة تحت.</div>';
+    }
+    box.innerHTML=regHtml;
+    if(rn||nm.length>=2) evShowNewOrgAccordion();
   }
+  list.innerHTML=html;
 }
 
 // (جديد) Enter في خانة رقم القيد = اختيار أول نتيجة مطابقة برقم القيد مباشرة (لو موجودة)
@@ -6569,6 +6630,7 @@ function evQuickPickOrg(orgId){
   document.getElementById('evs_year').value=o.y;
   document.getElementById('evs_dir').value=o.lv==='مركزي'?'مركزي':o.g;
   document.getElementById('evs_name').value=o.n;
+  evSyncSenderLock();
   ['evs_reg','evs_year','evs_dir','evs_name'].forEach(id=>{
     const el=document.getElementById(id);
     if(el){ el.disabled=true; el.style.background='#f0f4f8'; el.style.color='#5a6b7a'; }
@@ -6581,15 +6643,19 @@ function evQuickPickOrg(orgId){
   // ننزل تلقائيًا لأول خانة في تسجيل الحدث الفعلي بعد ما القسم يتبني، ونخفي سؤال
   // "هل دي جمعية؟" لأنه بقى معروف فعلاً (اخترتِ جمعية بالفعل)
   setTimeout(()=>{
-    document.getElementById('ev_inDate')?.focus();
     const flagWrap=document.getElementById('ev_isOrgFlagWrap');
     if(flagWrap) flagWrap.style.display='none';
-  },120);
+    // الرقم/التاريخ/النوع/الجهة اتكتبوا قبل كده - ننزل مباشرة على الموضوع (ولو لسه الإدارة مش مختارة نروح لرقم الوارد)
+    const subj=document.getElementById('ev_subject');
+    (subj && subj.offsetParent!==null ? subj : document.getElementById('ev_inNum'))?.focus();
+    if(subj && subj.select) subj.select();
+  },150);
 }
 
 // (جديد) زرار "استعادة" - يرجّع خانات الصف السريع مفتوحة زي ما كانت، ويمسح اختيار الجمعية
 function evQuickReset(){
   evSelectedOrg=null;
+  evClearOrgQuery();
   window._evQuickNewOrgMode=false;
   ['evs_reg','evs_year','evs_dir','evs_name'].forEach(id=>{
     const el=document.getElementById(id);
@@ -6608,7 +6674,7 @@ function evQuickReset(){
   document.getElementById('evSearchList').innerHTML='';
   const evs2=document.getElementById('evs2'); if(evs2) evs2.style.display='none';
   evShowDefaultView();
-  document.getElementById('evs_reg')?.focus();
+  setTimeout(()=>{ (document.getElementById('ev_inNum')||document.getElementById('ev_orgQuery'))?.focus(); },60);
 }
 
 // (جديد) لما رقم القيد يتكتب ويتأكد إنه مش مكرر (جمعية جديدة محتملة)، نظهر سهم "باقي
@@ -6673,17 +6739,17 @@ document.addEventListener('keydown',function(ev){
   // (جديد) نفس فكرة الـ Enter دي بقت متاحة كمان في قسم "جهة أخرى" (opTab1) بشكل دائم
   // ومستقل تمامًا - قسم جديد بالكامل، مالوش أي علاقة بمسار "تسجيل الجمعيات" الأصلي.
   const selector = (window._continueToEventAfterCreate ? '#evs2,#evs5,#os2,#os5,' : '#evs2,#evs5,') + '#opTab1';
-  const step=el.closest(selector);
+  const step=el.closest('#ev_mainBlock') || el.closest(selector);
   if(!step) return;
   ev.preventDefault();
   const focusable=[...step.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=file]):not([disabled]):not([readonly]),select:not([disabled]),button:not([disabled])')]
-    .filter(x=>x.offsetParent!==null); // ظاهر فعليًا على الشاشة بس (مش مخفي)
+    .filter(x=>x.offsetParent!==null && !x.hasAttribute('data-nav-skip') && !(step.id==='ev_mainBlock' && x.tagName==='BUTTON') && !(step.id==='ev_mainBlock' && x.id==='ev_status')); // ظاهر فعليًا على الشاشة بس (مش مخفي)
   const idx=focusable.indexOf(el);
   if(idx>-1 && idx<focusable.length-1){
     focusable[idx+1].focus();
     if(focusable[idx+1].select) focusable[idx+1].select();
   } else {
-    const finBtn = (step.id==='evs5'||step.id==='os5') ? (document.getElementById('evFinishBtn')||step.querySelector('.btn-p'))
+    const finBtn = (step.id==='ev_mainBlock'||step.id==='evs5'||step.id==='os5') ? (document.getElementById('evFinishBtn')||step.querySelector('.btn-p'))
       : step.id==='opTab1' ? document.getElementById('opSaveBtn')
       : step.querySelector('.btn-p');
     if(finBtn) finBtn.click();
@@ -6721,9 +6787,12 @@ function evMaybeSetWorkDeptDefault(){
     saveSession(CU);
   }
 }
+window.EV_REGISTRATION_ONLY=true; // صفحة آخر حدث للمسجِّل = تسجيل وارد فقط (البيانات الإدارية/الإجراء في زر إضافة إجراء)
 function evShowDefaultView(){
   window._evOverrideDeptPicker=false;
+  evEnsureTopFields();
   goEvStep(5);
+  evFillTodayIfEmpty(); evSyncSenderLock();
   const evs1=document.getElementById('evs1'); if(evs1) evs1.style.display='block';
   const evs2=document.getElementById('evs2'); if(evs2) evs2.style.display='none';
   // (جديد) البيانات الإدارية (نوع القرار/رقم القرار...) خاصة بجمعية محدَّدة - لو مفيش
@@ -6736,6 +6805,7 @@ function evShowDefaultView(){
 }
 function evShowCombinedView(){
   goEvStep(5); // بيشغّل كل منطق تجهيز خطوة ٥ (اختيار الإدارة/فورم البيانات الإدارية..إلخ) زي ما هو
+  setTimeout(evSyncSenderLock,0);
   const o=evSelectedOrg;
   const evs1=document.getElementById('evs1'); if(evs1) evs1.style.display='block';
   const evs2=document.getElementById('evs2'); if(evs2) evs2.style.display='block';
@@ -6763,6 +6833,8 @@ function evShowCombinedView(){
 // (جديد) رجوع لخانة البحث فاضية - نفس اللي بيحصل تلقائي بعد ما تخلّصي تسجيل حدث بنجاح،
 // وكمان دلوقتي بيستخدمها زرار "→ رجوع" في خطوة ٥ بدل ما كان بيرجّع لشاشة منفصلة.
 function evResetToSearch(){
+  evClearOrgQuery();
+  { const tw=document.getElementById('ev_topFieldsWrap'); if(tw){ tw.innerHTML=''; tw.dataset.built=''; } }
   ['ev','evq'].forEach(p=>{
     const w=document.getElementById(p+'_extraFieldsWrap');
     if(w){w.innerHTML='';w.dataset.built='';}
@@ -6793,7 +6865,7 @@ function evResetToSearch(){
   const q4=document.getElementById('evs4Questions'); if(q4){ q4.dataset.loaded=''; q4.innerHTML='<div class="al al-i">⏳ جاري تحميل الأسئلة...</div>'; }
   const evs2=document.getElementById('evs2'); if(evs2) evs2.style.display='none';
   evShowDefaultView();
-  document.getElementById('evs_reg')?.focus();
+  setTimeout(()=>{ (document.getElementById('ev_inNum')||document.getElementById('ev_orgQuery'))?.focus(); },60);
 }
 
 function evJumpToLastEventStep(o){
@@ -6863,7 +6935,7 @@ function goEvStep(n){
       }
     }
     document.getElementById('evSelOrgBanner2').innerHTML=o?`<div class="found-box">✅ <strong>${o.n}</strong> | ${o.r}/${o.y} <span class="badge ${o.lv==='مركزي'?'b-g':'b-b'}">${o.lv}</span></div>`:'';
-    document.getElementById('evAdminTitle').textContent='📅 تسجيل آخر حدث - '+dept;
+    document.getElementById('evAdminTitle').textContent='📅 تسجيل وارد - '+dept;
     const today=new Date().toISOString().split('T')[0];
 
     if(dept==='القيد'){
@@ -6896,7 +6968,7 @@ function goEvStep(n){
       if(w&&!w.dataset.built){
         w.innerHTML=buildEvQuickExtraFields('ev');
         w.dataset.built='1';
-        evInitRememberedType('ev');
+        evEnsureTopFields();
       }
       // (إصلاح باج) نقل evAdminPickerWrap/evAdminDataWrap جوه سهم "الإجراء" (فوقه) - بقى
       // بيتنفّذ في كل مرة (مش مرة واحدة بس عند أول بناء) عشان لو أول مرة اتبنى فيها الفورم
@@ -6930,7 +7002,7 @@ function goEvStep(n){
         prefillLastEventFields('ev',rec);
         applyFillEmptyOnlyLock('evNormalForm');
       };
-      if(evPickerWrap){
+      if(evPickerWrap && !window.EV_REGISTRATION_ONLY){
         evPickerWrap.innerHTML='';
         if(o&&o.OrgID){
           evPickerWrap.innerHTML='<div class="al al-i">⏳ جاري تحميل الأحداث السابقة لهذه الجمعية...</div>';
@@ -7340,92 +7412,144 @@ function quickFillDissolutionNotice(prefix){
     document.getElementById(prefix+'_subject')?.focus();
   }
 }
-function buildEvQuickExtraFields(prefix){
+// (جديد) الصف الأول للمسجِّل (تاريخ الوارد ← رقم الوارد ← النوع ← الجهة) - نفس الـ IDs
+// الأصلية (ev_inDate/ev_inNum/ev_actionType/ev_sender) فكل دوال القراءة/التعبئة/المزامنة
+// تشتغل زي ما هي من غير أي تعديل. الجهة هنا بتحدّد المديرية تلقائيًا في خانة البحث (evSenderToDir).
+function buildEvTopFields(prefix){
   return `
-    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-top:6px">
-      <div class="fg" style="width:145px;flex:0 0 auto">
-        <label class="lbl">تاريخ الوارد</label>
+    <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+      <div class="fg" style="width:150px;flex:0 0 auto">
+        <label class="lbl" id="${prefix}_inDateLbl">تاريخ الوارد</label>
         <input type="date" class="fc" id="${prefix}_inDate" oninput="syncIncomingNumDate('${prefix}')"></div>
-      <div class="fg" style="width:110px;flex:0 0 auto">
-        <label class="lbl">رقم الوارد</label>
+      <div class="fg" style="width:120px;flex:0 0 auto">
+        <label class="lbl" id="${prefix}_inNumLbl">رقم الوارد</label>
         <input class="fc" id="${prefix}_inNum" placeholder="رقم الوارد" oninput="syncIncomingNumDate('${prefix}')"></div>
-      <div class="fg" style="flex:1 1 180px;min-width:150px">
-        <label class="lbl">الجهة الوارد منها</label>
-        <input class="fc" id="${prefix}_sender" placeholder="اسم الجهة (وزارة، شركة، إدارة أخرى...)"></div>
-      <div class="fg" style="flex:2 1 220px;min-width:180px">
-        <label class="lbl">الموضوع</label>
-        <input class="fc" id="${prefix}_subject" placeholder="اكتب الموضوع..."></div>
-    </div>
-    <div style="margin-top:6px">
-      <button type="button" class="btn btn-s" style="padding:5px 12px;font-size:11px" onclick="quickFillDissolutionNotice('${prefix}')">⚡ ده مذكرة حل جمعية من الوزارة</button>
-    </div>
-    <div id="${prefix}_isOrgFlagWrap" class="fg" style="background:#fdf6ec;border:1px dashed #e2b04a;border-radius:8px;padding:9px 12px;margin:10px 0">
-      <label class="lbl" style="margin-bottom:6px">هل الحدث ده خاص بجمعية/مؤسسة معيّنة؟</label>
-      <div class="rg">
-        <label class="rl"><input type="radio" name="${prefix}_isOrgFlag" value="org"> نعم، جمعية (بس لسه مش محدِّدة اسمها فوق)</label>
-        <label class="rl"><input type="radio" name="${prefix}_isOrgFlag" value="other" checked> لا، جهة أخرى فعلاً (وزارة/شركة/جهة حكومية)</label>
-      </div>
-      <div style="font-size:10px;color:var(--muted);margin-top:4px">⚠️ لو اخترتِ "نعم جمعية" وسبتيها من غير ما تحددي رقم القيد/اسم الجمعية فوق، الحدث هيتسجّل مؤقتًا كـ"جهة أخرى" ويتحط في قائمة "جمعيات تحتاج معرفة بياناتها" عشان تكمليه بعدين.</div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
-      <div class="fg" style="flex:1 1 200px;min-width:160px">
-        <label class="lbl">المستلم</label>
-        <input class="fc" id="${prefix}_receiver" placeholder="اسم المستلم" oninput="evSyncActionBy('${prefix}')"></div>
       <div class="fg" style="width:190px;flex:0 0 auto">
         <label class="lbl">النوع</label>
-        <input class="fc" id="${prefix}_actionType" list="${prefix}_typeList" placeholder="اكتبي أو اختاري (خطاب، قرار...)" onchange="evMaybeRememberType('${prefix}')">
+        <input class="fc" id="${prefix}_actionType" list="${prefix}_typeList" placeholder="خطاب / مذكرة / قرار" onchange="evMaybeRememberType('${prefix}');evOnTypeChange('${prefix}')">
         <datalist id="${prefix}_typeList"><option>خطاب</option><option>قرار</option><option>مذكرة</option></datalist>
         <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);margin-top:4px;cursor:pointer">
           <input type="checkbox" id="${prefix}_rememberType" onchange="evMaybeRememberType('${prefix}')"> 🔒 متسأليش تاني
           <button type="button" id="${prefix}_unlockTypeBtn" style="display:none;border:none;background:none;color:var(--p);cursor:pointer;font-size:10px" onclick="evUnlockType('${prefix}')">✏️ تغيير</button>
         </label>
       </div>
+      <div class="fg" style="flex:1 1 200px;min-width:170px">
+        <label class="lbl">الجهة الوارد منها <span style="font-size:10px;color:var(--muted)">(مديرية / مركزي / جهة أخرى)</span></label>
+        <input class="fc" id="${prefix}_sender" list="evQuickDirList" placeholder="اكتبي الجهة..." oninput="evSenderToDir()"></div>
     </div>
-    <div style="background:#f8f9fa;border-radius:8px;padding:12px;margin:10px 0">
-      <button type="button" id="${prefix}_actionsToggleBtn" onclick="toggleActionsBlock('${prefix}')"
-        style="width:100%;text-align:right;background:#eef5fb;border:1px dashed var(--p);border-radius:8px;padding:9px 13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--p);font-weight:600">
-        <span>📋 البيانات الإدارية / الإجراء <span style="font-weight:400;color:var(--muted);font-size:11px">(اضغطي لفتحها - البيانات الإدارية دايمًا بتتسجل لو اتكتبت، وهتُحسب كإجراء أول تلقائي لو معملتيش إجراء منفصل)</span></span>
-        <span id="${prefix}_actionsToggleIcon" style="font-size:15px">▸</span>
-      </button>
-      <div id="${prefix}_actionsBlock" style="display:none;margin-top:10px">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
-        <button type="button" class="btn btn-s" style="padding:3px 10px;font-size:10px" onclick="goEvStep(5)">🔄 إعادة تحميل البيانات الإدارية</button>
-      </div>
-      <div id="${prefix}_adminDataSlot"></div>
-      <div style="font-size:11px;color:var(--muted);font-weight:600;margin:10px 0 4px">الإجراء</div>
-      <div id="${prefix}_actions_container">
-        <div class="fg2 ${prefix}_action_row" style="margin-top:10px">
-          <div class="fg full"><label class="lbl">توصيف الإجراء</label><input class="fc ${prefix}_action" placeholder="وصف الإجراء" oninput="autoDetectActionStatus('${prefix}')"></div>
-          <div class="fg"><label class="lbl">رقم الصادر</label><input class="fc ${prefix}_outNum" placeholder="رقم الصادر"></div>
-          <div class="fg"><label class="lbl">تاريخ الصادر</label><input type="date" class="fc ${prefix}_outDate"></div>
-          <div class="fg full"><label class="lbl">من قام بالإجراء</label><input class="fc ${prefix}_actionBy" placeholder="اسم من قام بالإجراء" oninput="this.dataset.userEdited='1'"></div>
-        </div>
-      </div>
-      <button type="button" class="btn btn-s" style="margin-top:8px;padding:5px 14px;font-size:12px" onclick="addActionRow('${prefix}')">+ إضافة إجراء آخر</button>
+    <div id="${prefix}_typeHint" style="font-size:11px;color:var(--muted);margin-top:4px"></div>`;
+}
+// (جديد) الجزء التاني (بعد خانات الجمعية): الموضوع ← المستلم. مفيش هنا بيانات إدارية ولا إجراء
+// خالص (بتتسجّل من زر "إضافة إجراء" في بحث آخر حدث).
+function buildEvQuickExtraFields(prefix){
+  return `
+    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+      <div class="fg" style="flex:3 1 260px;min-width:200px">
+        <label class="lbl">الموضوع</label>
+        <input class="fc" id="${prefix}_subject" placeholder="اكتب الموضوع..."></div>
+      <div class="fg" style="flex:1 1 150px;min-width:130px">
+        <label class="lbl">المستلم</label>
+        <input class="fc" id="${prefix}_receiver" placeholder="اسم المستلم"></div>
+      <div class="fg" style="width:140px;flex:0 0 auto">
+        <label class="lbl">حالة الحدث</label>
+        <select class="fc" id="${prefix}_status">
+          <option value="جاري العمل">🔄 جاري العمل</option>
+          <option value="مكتمل">✅ مكتمل</option>
+        </select></div>
+      <div class="fg" style="display:flex;align-items:center;gap:12px;flex:0 0 auto;padding-bottom:8px">
+        <label class="cl" style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="${prefix}_important"> ⭐ هام</label>
+        <label class="cl" style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="${prefix}_urgent"> 🚨 عاجل</label>
       </div>
     </div>
-    <details style="margin:8px 0">
-      <summary style="cursor:pointer;font-size:12px;color:var(--muted)">▸ بيانات إضافية (حالة الحدث / هام / عاجل / مستند)</summary>
-      <div class="fg2" style="margin-top:8px">
-        <div class="fg"><label class="lbl">حالة الحدث</label>
-          <select class="fc" id="${prefix}_status">
-            <option value="جاري العمل">🔄 جاري العمل</option>
-            <option value="مكتمل">✅ مكتمل</option>
-          </select></div>
-        <div class="fg" style="display:flex;align-items:flex-end;gap:14px">
-          <label class="cl" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="${prefix}_important"> ⭐ هام</label>
-          <label class="cl" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="${prefix}_urgent"> 🚨 عاجل</label>
-        </div>
-      </div>
-      <div class="fg full" style="margin-top:8px">
-        <label class="lbl">📎 مستند الحدث (اختياري)</label>
-        <div style="display:flex;gap:7px;flex-wrap:wrap">
-          <input type="file" class="fc" id="${prefix}_evFile" style="flex:1;min-width:180px" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-          <button type="button" class="btn btn-p" style="padding:6px 14px;font-size:12px" onclick="uploadEventFile('${prefix}')">📤 رفع المستند</button>
-        </div>
-        <div id="${prefix}_evFileMsg" style="margin-top:6px;font-size:11px;color:var(--muted)"></div>
-      </div>
-    </details>`;
+    <div class="fg" style="margin-top:8px">
+      <label class="lbl">📎 مستند الوارد <span style="font-size:10px;color:var(--muted)">(اختياري - بيترفع تلقائيًا عند الحفظ، ومن زر "إضافة إجراء" تقدري تضيفي ورقة أو تغيّري الملف)</span></label>
+      <input type="file" class="fc" id="${prefix}_evFile" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+      <div id="${prefix}_evFileMsg" style="margin-top:4px;font-size:11px;color:var(--muted)"></div>
+    </div>
+    <div id="${prefix}_isOrgFlagWrap" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--muted)">
+      <span>الحدث خاص بجمعية؟</span>
+      <label class="rl"><input type="radio" name="${prefix}_isOrgFlag" value="org"> جمعية (لسه مش محدّدة فوق)</label>
+      <label class="rl"><input type="radio" name="${prefix}_isOrgFlag" value="other" checked> جهة أخرى</label>
+      <span>— لو رقم القيد/الاسم فاضيين يتسجّل "جهة أخرى".</span>
+    </div>`;
+}
+// بيبني صف (تاريخ/رقم/نوع/جهة) مرة واحدة ومن أول لحظة - حتى قبل اختيار الإدارة - عشان الشخص يبدأ يكتب فورًا
+function evEnsureTopFields(){
+  const topW=document.getElementById('ev_topFieldsWrap');
+  if(!topW || topW.dataset.built) return;
+  topW.innerHTML=buildEvTopFields('ev');
+  topW.dataset.built='1';
+  evFillTodayIfEmpty();
+  evInitRememberedType('ev');
+  evOnTypeChange('ev');
+}
+// خانة واحدة ذكية "اسم الجمعية أو رقم القيد": أرقام (أو رقم/سنة) = رقم قيد، غير كده = اسم.
+// بتملّي الخانات التلقائية (رقم القيد/السنة/المديرية) اللي لسه شغّالة بنفس الـIDs القديمة،
+// فكل منطق البحث والتسجيل الحالي يشتغل زي ما هو.
+function evOrgQueryInput(){
+  if(typeof evSelectedOrg!=='undefined' && evSelectedOrg) return;
+  const q=(document.getElementById('ev_orgQuery')?.value||'').trim();
+  const reg=document.getElementById('evs_reg'), yr=document.getElementById('evs_year'), nm=document.getElementById('evs_name');
+  if(!reg||!nm) return;
+  const m=q.match(/^(\d+)\s*(?:[\/\\-]\s*(\d{4}))?$/);
+  if(m){
+    reg.value=m[1]; reg.dataset.fromQuery='1';
+    if(m[2] && yr) yr.value=m[2];
+    nm.value='';
+  } else {
+    if(reg.dataset.fromQuery==='1'){ reg.value=''; reg.dataset.fromQuery=''; }
+    nm.value=q;
+  }
+  evQuickCheck();
+}
+function evOrgQueryKey(e){
+  if(e.key!=='Enter') return;
+  if(window._evQuickTopId && !evSelectedOrg){ e.preventDefault(); e.stopPropagation(); evQuickPickOrg(window._evQuickTopId); }
+}
+function evClearOrgQuery(){
+  const q=document.getElementById('ev_orgQuery');
+  if(q){ q.value=''; q.readOnly=false; q.style.background=''; q.style.color=''; }
+  const reg=document.getElementById('evs_reg'); if(reg) reg.dataset.fromQuery='';
+}
+// تاريخ الوارد تلقائي بتاريخ التسجيل (وممكن تتغيّر)
+function evFillTodayIfEmpty(){
+  const d=document.getElementById('ev_inDate');
+  if(d && !d.value){ d.value=new Date().toISOString().split('T')[0]; }
+}
+// النوع = مذكرة: تاريخ/رقم الوارد هما تاريخ/رقم المذكرة (نفس الخانتين، تتغيّر التسمية بس، والإحصاء
+// بيقرأهم من نفس الأعمدة). النوع = قرار: رقم القرار هيتطلب ممّن يسجّل الإجراء لاحقًا.
+function evOnTypeChange(prefix){
+  const t=(document.getElementById(prefix+'_actionType')?.value||'').trim();
+  const dl=document.getElementById(prefix+'_inDateLbl'), nl=document.getElementById(prefix+'_inNumLbl'), hint=document.getElementById(prefix+'_typeHint');
+  if(dl) dl.textContent = t==='مذكرة' ? 'تاريخ المذكرة' : 'تاريخ الوارد';
+  if(nl) nl.textContent = t==='مذكرة' ? 'رقم المذكرة' : 'رقم الوارد';
+  if(hint) hint.textContent = t==='مذكرة' ? 'ℹ️ رقم وتاريخ المذكرة هما رقم وتاريخ الوارد - ولا يتكرر نفس الرقم.'
+    : t==='قرار' ? 'ℹ️ رقم القرار هيتطلب من اللي هيسجّل الإجراء (من زر إضافة إجراء في بحث آخر حدث).' : '';
+}
+// الجهة بتحدّد جهة الجمعية: لو الجهة المكتوبة اسم مديرية/محافظة أو "مركزي"، نملأ خانة المديرية فوق
+// تلقائيًا (لو لسه فاضية ومفيش جمعية مختارة) - ولو الجمعية اتحدّدت، الجهة بتتقفل رمادي (evSyncSenderLock)
+function evSenderToDir(){
+  if(typeof evSelectedOrg!=='undefined' && evSelectedOrg) return;
+  const v=(document.getElementById('ev_sender')?.value||'').trim();
+  const dir=document.getElementById('evs_dir');
+  if(!v||!dir||dir.value.trim()) return;
+  const isCentral=/^(مركزي|الادارة المركزية|الإدارة المركزية|الادارة العامة|الإدارة العامة)/.test(v) || /مركزي/.test(v);
+  const gov=(typeof GOVS!=='undefined'?GOVS:[]).find(g=>g===v || v.replace(/^مديرية\s*(التضامن الاجتماعي)?\s*(ب|ب\s)?/,'').trim()===g);
+  if(isCentral){ dir.value='مركزي'; }
+  else if(gov){ dir.value=gov; }
+  else return;
+  if(typeof evQuickCheck==='function') evQuickCheck();
+}
+function evSyncSenderLock(){
+  const sn=document.getElementById('ev_sender'); if(!sn) return;
+  const o=(typeof evSelectedOrg!=='undefined')?evSelectedOrg:null;
+  const oq=document.getElementById('ev_orgQuery');
+  if(o && o.OrgID && oq){ oq.value=o.n||''; oq.readOnly=true; oq.style.background='#f0f4f8'; oq.style.color='var(--muted)'; }
+  else if(!o && oq && oq.readOnly){ evClearOrgQuery(); }
+  if(o && o.OrgID){
+    if(!sn.value.trim()) sn.value = o.lv==='مركزي' ? 'مركزي' : (o.g||'');
+    sn.readOnly=true; sn.style.background='#f0f4f8'; sn.style.color='var(--muted)';
+  } else { sn.readOnly=false; sn.style.background=''; sn.style.color=''; }
 }
 // رفع مستند "آخر حدث" فعلياً على السيرفر، ويُحفظ مساره لإرساله مع الحدث/الطلب
 // (جديد) existingPath: لو موجودة ومعاها اختيار "إضافة كورقة" متفعّل - بيدمج بدل ما يستبدل
@@ -7561,6 +7685,7 @@ function resetLastEventExtraFields(prefix){
     const el=document.getElementById(prefix+suf);
     if(el){ el.value=''; unlockField(el); }
   });
+  if(prefix==='ev') evFillTodayIfEmpty();
   const st=document.getElementById(prefix+'_status');
   if(st){ st.value='جاري العمل'; unlockField(st); }
   const imp=document.getElementById(prefix+'_important');
@@ -7900,7 +8025,7 @@ async function finishEvEntry(){
       // كان متسجّل فعلاً لنفس الجمعية (عشان مانكررش نفس السجل من غير داعي). فحص التكرار نفسه
       // بيتم في السيرفر (نفس الشرط: نفس الرقم التسلسلي + نفس السنة) - هنا بس منع إرسال مكرر واضح.
       if(dept==='جمع المال'){
-        const admData=collectReqDeptData('جمع المال','evadm_');
+        const admData=(window.EV_REGISTRATION_ONLY?null:collectReqDeptData('جمع المال','evadm_'));
         if(admData==='INVALID') return;
         if(admData && admData!=='INVALID'){ admDataWasSubmitted=true; admSummary='ترخيص جمع مال'+(admData.LicenseNumber?(' رقم '+admData.LicenseNumber):''); }
         if(admData){
@@ -7947,7 +8072,7 @@ async function finishEvEntry(){
           }
         }
       } else if(dept==='المنح'){
-        const admData=collectReqDeptData('المنح','evadm_');
+        const admData=(window.EV_REGISTRATION_ONLY?null:collectReqDeptData('المنح','evadm_'));
         if(admData==='INVALID') return;
         if(admData){ admDataWasSubmitted=true; admSummary='منحة '+(admData.GrantName||''); }
         if(admData){
@@ -7968,7 +8093,7 @@ async function finishEvEntry(){
           }
         }
       } else if(dept==='التشريعات'){
-        const admData=collectReqDeptData('التشريعات','evadm_');
+        const admData=(window.EV_REGISTRATION_ONLY?null:collectReqDeptData('التشريعات','evadm_'));
         if(admData==='INVALID') return;
         if(admData){ admDataWasSubmitted=true; admSummary='قرار '+(admData.DecreeType||'')+(admData.DecreeNumber?(' رقم '+admData.DecreeNumber):''); }
         if(admData){
@@ -7988,7 +8113,7 @@ async function finishEvEntry(){
           }
         }
       } else if(dept==='المحظورة'){
-        const admData=collectReqDeptData('المحظورة','evadm_');
+        const admData=(window.EV_REGISTRATION_ONLY?null:collectReqDeptData('المحظورة','evadm_'));
         if(admData==='INVALID') return;
         if(admData){ admDataWasSubmitted=true; admSummary='بيانات حظر/تقييد'+(admData.CaseNumber?(' - قضية رقم '+admData.CaseNumber):''); }
         if(admData){
@@ -8011,7 +8136,7 @@ async function finishEvEntry(){
         }
       } else if(dept==='المشروعات'){
         // الرقم التسلسلي (لو موجود) لا يتكرر لنفس الجمعية في نفس السنة - نفس فكرة رقم الترخيص.
-        const admData=collectReqDeptData('المشروعات','evadm_');
+        const admData=(window.EV_REGISTRATION_ONLY?null:collectReqDeptData('المشروعات','evadm_'));
         if(admData){ admDataWasSubmitted=true; admSummary='بيانات مشروع'+(admData.SerialNumber?(' - رقم تسلسلي '+admData.SerialNumber):''); }
         if(admData){
           const rowsTypes=Array.isArray(admData.ProjectTypes)&&admData.ProjectTypes.length?admData.ProjectTypes:['غير محدد'];
@@ -8029,7 +8154,7 @@ async function finishEvEntry(){
         }
       } else if(dept==='تقرير تفتيش الجمعيات'){
         // عدم التكرار: نفس الفترة (من - إلى) لا تتكرر لنفس الجمعية - النطاق (مركزي/مديرية) يتحدد تلقائيًا في السيرفر
-        const admData=collectReqDeptData('تقرير تفتيش الجمعيات','evadm_');
+        const admData=(window.EV_REGISTRATION_ONLY?null:collectReqDeptData('تقرير تفتيش الجمعيات','evadm_'));
         if(admData){ admDataWasSubmitted=true; admSummary='تقرير تفتيش '+(admData.YearFrom||'')+'-'+(admData.YearTo||''); }
         if(admData){
           try{
@@ -8143,6 +8268,7 @@ function switchSTab(btn,id){
   // ثابتة من غير فايدة.
   const sharedFilters=document.getElementById('sharedSearchFilters');
   if(sharedFilters) sharedFilters.style.display = (id==='st4'||id==='st5') ? 'none' : '';
+  const sfd=document.getElementById('sharedFiltersDetails'); if(sfd) sfd.open = (id==='st2'||id==='st3');
   if(id==='st5'){ doAOSearch(); return; }
   doSearch();
 }
@@ -8472,28 +8598,43 @@ async function doSearch(){
     if(evPage>evTotalPages) evPage=evTotalPages;
     const pageRows=filteredRows.slice((evPage-1)*FULL_PAGE_SIZE, evPage*FULL_PAGE_SIZE);
     renderEvPagination(evTotalPages);
-    tbEv.innerHTML = pageRows.map((r,i)=>`<tr>
-      <td><span class="badge ${r.type==='جمعية'?'b-b':'b-o'}">${r.type}</span></td>
-      <td><strong>${r.source==='org'?(r.name||'—'):(r.orgNameGuess?('🆕 '+escapeHtml(r.orgNameGuess)):'—')}</strong>${(r.source==='org'&&r.orgId&&_dupRegIds.has(r.orgId))?' <span class="badge" style="background:#fdf2e9;color:#b9770e;border:1px solid #f5cba7;font-size:10px">🔁 قيد مكرر</span>':''}${(r.source==='other'&&r.orgNameGuess)?' <span class="badge" style="background:#fdf6ec;color:#b9770e;border:1px solid #e2b04a;font-size:10px">بيانات غير مكتملة</span>':''}</td>
-      <td>${r.gov||'—'}</td>
-      <td>${r.source==='org'?(r.sender||'—'):(r.name||'—')}</td>
-      <td>${r.inDateRaw||'—'}</td>
-      <td>${r.inNum}</td>
-      <td>${r.subject}</td>
-      <td>${r.receiver||'—'}</td>
-      <td style="font-size:11px">${(r.actions&&r.actions.length)?r.actions.map(a=>a.action||'').filter(Boolean).join(' | ')||'—':'—'}</td>
-      <td style="font-size:11px">${(r.actions&&r.actions.length)?r.actions.map(a=>a.outNum||'').filter(Boolean).join(' | ')||'—':'—'}</td>
-      <td style="font-size:11px">${(r.actions&&r.actions.length)?r.actions.map(a=>a.outDate||'').filter(Boolean).join(' | ')||'—':'—'}</td>
-      <td>${r.regNumRaw}</td><td>${r.regYearRaw}</td>
-      <td>${r.eventDateRaw||'—'}</td><td>${r.by||'—'}</td>
-      <td>${r.createdAtRaw||'—'}</td>
-      <td>${r.dept}</td>
-      <td>${r.filePath?`<a class="btn btn-g" style="padding:3px 8px;font-size:11px;text-decoration:none" href="${window.location.origin}${r.filePath}" target="_blank" rel="noopener">📎 عرض</a>`:'—'}</td>
-      <td>${(r.id&&canEditEventRow(r))?`<button class="btn btn-s" style="padding:3px 8px;font-size:11px" onclick="openEventEditModal(${i})">✏️ تعديل</button>`:'—'}</td>
-      <td>${(r.id&&canEditEventRow(r))?`<button class="btn btn-d" style="padding:3px 8px;font-size:11px" onclick="deleteEventFromSearch(${r.id},'${r.source}')">🗑️ حذف</button>`:'—'}</td>
-      <td>${r.orgId?`<button class="btn btn-p" style="padding:3px 8px;font-size:11px" onclick="viewOrgRelatedEvents(${r.orgId},'${(r.name||'').replace(/'/g,"\\'")}')">🔗 الاطلاع على أحداث أخرى مرتبطة بنفس الجمعية</button>`:(r.source==='other'?`<button class="btn btn-p" style="padding:3px 8px;font-size:11px" onclick="viewOtherPartyForm(${i})">📋 استمارة</button>`:'—')}</td>
-      <td>${(r.source==='org'&&r.id&&canEditEventRow(r))?`<button class="btn btn-p" style="padding:3px 8px;font-size:11px;background:#8e44ad" onclick="openConvertToOtherPartyModal(${i})">🔄 تحويل لجهة أخرى</button>`:((r.source==='other'&&r.id&&canEditEventRow(r))?`<button class="btn btn-p" style="padding:3px 8px;font-size:11px;background:#117a65" onclick="openReverseConvertToOrgFlow(${i})">🔁 تحويل إلى جمعية</button>`:'—')}</td>
-    </tr>`).join('') || '<tr><td colspan="22" style="text-align:center;color:var(--muted);padding:15px">لا توجد نتائج</td></tr>';
+    tbEv.innerHTML = pageRows.map((r,pi)=>{
+      const i=(evPage-1)*FULL_PAGE_SIZE+pi; // رقم الصف الحقيقي في كل النتائج (مش في الصفحة بس) - عشان الأزرار تشتغل صح في الصفحة 2 وما بعدها
+      const orgNm = r.source==='org'?(r.name||'—'):(r.orgNameGuess?('🆕 '+escapeHtml(r.orgNameGuess)):(r.name||'—'));
+      const acts=(r.actions||[]).filter(a=>a.action||a.outNum||a.outDate||a.by);
+      const canAct=!!(r.id&&canAddActionToEvent(r)), canEd=!!(r.id&&canEditEventRow(r));
+      const moreBtns=[
+        r.orgId?`<button class="btn btn-p" onclick="viewOrgRelatedEvents(${r.orgId},'${(r.name||'').replace(/'/g,"\\'")}')">🔗 أحداث أخرى لنفس الجمعية</button>`:(r.source==='other'?`<button class="btn btn-p" onclick="viewOtherPartyForm(${i})">📋 استمارة</button>`:''),
+        (r.source==='org'&&canEd)?`<button class="btn btn-p" style="background:#8e44ad" onclick="openConvertToOtherPartyModal(${i})">🔄 تحويل لجهة أخرى</button>`:((r.source==='other'&&canEd)?`<button class="btn btn-p" style="background:#117a65" onclick="openReverseConvertToOrgFlow(${i})">🔁 تحويل إلى جمعية</button>`:''),
+        canEd?`<button class="btn btn-d" onclick="deleteEventFromSearch(${r.id},'${r.source}')">🗑️ حذف</button>`:''
+      ].filter(Boolean).join('');
+      const chip=(t)=>t?`<span class="evc-chip">${t}</span>`:'';
+      return `<tr><td class="evc-td" colspan="22"><div class="evc ${r.status==='مكتمل'?'done':''} ${r.isUrgent?'urgent':''}">
+        <div class="evc-top">
+          <div class="evc-title"><span class="badge ${r.type==='جمعية'?'b-b':'b-o'}">${r.type}</span> <strong>${orgNm}</strong>${(r.source==='org'&&r.orgId&&_dupRegIds.has(r.orgId))?' <span class="badge" style="background:#fdf2e9;color:#b9770e;border:1px solid #f5cba7;font-size:10px">🔁 قيد مكرر</span>':''}${(r.source==='other'&&r.orgNameGuess)?' <span class="badge" style="background:#fdf6ec;color:#b9770e;border:1px solid #e2b04a;font-size:10px">بيانات غير مكتملة</span>':''}</div>
+          <div class="evc-btns">
+            ${canAct?`<button class="btn btn-p" onclick="openEventEditModal(${i},'action')">➕ إضافة إجراء</button>`:''}
+            ${canEd?`<button class="btn btn-s" onclick="openEventEditModal(${i})">✏️ تعديل</button>`:''}
+            ${r.filePath?`<a class="btn btn-g" href="${window.location.origin}${r.filePath}" target="_blank" rel="noopener">📎 المستند</a>`:''}
+            ${moreBtns?`<details class="evc-more"><summary>⋯ المزيد</summary><div class="evc-menu">${moreBtns}</div></details>`:''}
+          </div>
+        </div>
+        <div class="evc-subject">${r.subject||'—'}${evPendingDecree(r)?' <span class="badge" style="background:#fdf2e9;color:#b9770e;border:1px solid #f5cba7;font-size:10px">⏳ بانتظار رقم القرار</span>':''}</div>
+        <div class="evc-meta">
+          ${chip(r.evType?('📄 '+r.evType):'')}
+          ${chip('📅 '+(r.inDateRaw||'—'))}
+          ${chip((r.inNum&&r.inNum!=='—')?('# '+r.inNum):'')}
+          ${chip(r.source==='org'?(r.sender?('من: '+r.sender):''):(r.name?('من: '+r.name):''))}
+          ${chip((r.gov&&r.gov!=='—')?('🏛️ '+r.gov):'')}
+          ${chip(r.receiver?('المستلم: '+r.receiver):'')}
+          ${chip(r.dept?('الإدارة: '+r.dept):'')}
+          ${chip(r.status==='مكتمل'?'✅ مكتمل':'🔄 جاري العمل')}
+          ${r.isImportant?chip('⭐ هام'):''}${r.isUrgent?chip('🚨 عاجل'):''}
+        </div>
+        ${acts.length?`<div class="evc-acts"><strong>الإجراءات:</strong><br>${acts.map(a=>`• ${escapeHtml(a.action||'—')}${a.by?(' <span style="color:var(--muted)">('+escapeHtml(a.by)+')</span>'):''}${(a.outNum||a.outDate)?(' — صادر: '+escapeHtml(String(a.outNum||'—'))+(a.outDate?(' بتاريخ '+escapeHtml(String(a.outDate))):'')):''}`).join('<br>')}</div>`:''}
+        <div class="evc-foot">${(r.regNumRaw&&r.regNumRaw!=='—')?('قيد '+r.regNumRaw+'/'+(r.regYearRaw&&r.regYearRaw!=='—'?r.regYearRaw:'')+' • '):''}${r.by?('سجّله: '+r.by+' • '):''}تاريخ التسجيل: ${r.createdAtRaw||r.eventDateRaw||'—'}</div>
+      </div></td></tr>`;
+    }).join('') || '<tr><td colspan="22" style="text-align:center;color:var(--muted);padding:15px">لا توجد نتائج</td></tr>';
   }
 
   // ── تبويب 2: بيانات شاملة ──
@@ -8849,6 +8990,152 @@ function populateEditActionRows(actions){
     c.appendChild(div);
   });
 }
+// (جديد) "إضافة إجراء" - مؤقتًا: المدير، أو أي موظف تابع لنفس الإدارة اللي الوارد موجّه ليها (بصلاحية تعديل).
+// الصلاحيات هتتظبط لاحقًا. السيرفر بيطبّق نفس القاعدة (PUT /events/:id/action).
+function canAddActionToEvent(r){
+  if(!CU) return false;
+  if(CU.role==='admin' || CU.action==='admin') return true;
+  return CU.action==='edit' && !!CU.dept && CU.dept===(r.dept||'');
+}
+// وارد نوعه "قرار" في التشريعات ولسه مفيش رقم قرار متسجَّل في إجراءاته = بانتظار رقم القرار
+function evPendingDecree(r){
+  if(!r || r.evType!=='قرار' || r.dept!=='التشريعات') return false;
+  return !(r.actions||[]).some(a=>/قرار/.test(a.action||'') && /رقم\s*\S+/.test(a.action||''));
+}
+// ===== (جديد) "املي من ملف": رفع خطاب الصادر (Word .docx) وتعبئة الإجراء ورقم/تاريخ الصادر منه تلقائيًا =====
+// القراءة بتتم في المتصفح نفسه (من غير أي مكتبة خارجية ولا رفع للسيرفر)، والخانات بتفضل قابلة للتعديل قبل الحفظ.
+async function evReadDocxText(file){
+  const buf=new Uint8Array(await file.arrayBuffer());
+  const dv=new DataView(buf.buffer);
+  let eocd=-1;
+  for(let i=buf.length-22;i>=Math.max(0,buf.length-70000);i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd=i; break; } }
+  if(eocd<0) throw new Error('الملف مش .docx صالح');
+  const count=dv.getUint16(eocd+10,true); let off=dv.getUint32(eocd+16,true);
+  let entry=null;
+  for(let n=0;n<count;n++){
+    if(dv.getUint32(off,true)!==0x02014b50) break;
+    const method=dv.getUint16(off+10,true), csize=dv.getUint32(off+20,true);
+    const nl=dv.getUint16(off+28,true), el=dv.getUint16(off+30,true), cl=dv.getUint16(off+32,true), lho=dv.getUint32(off+42,true);
+    const name=new TextDecoder().decode(buf.subarray(off+46,off+46+nl));
+    if(name==='word/document.xml'){ entry={method,csize,lho}; break; }
+    off+=46+nl+el+cl;
+  }
+  if(!entry) throw new Error('مفيش نص في الملف');
+  const lnl=dv.getUint16(entry.lho+26,true), lel=dv.getUint16(entry.lho+28,true);
+  const start=entry.lho+30+lnl+lel;
+  let data=buf.subarray(start,start+entry.csize);
+  let xmlBytes;
+  if(entry.method===0) xmlBytes=data;
+  else if(entry.method===8){
+    xmlBytes=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+  } else throw new Error('نوع ضغط غير مدعوم');
+  const doc=new DOMParser().parseFromString(new TextDecoder('utf-8').decode(xmlBytes),'application/xml');
+  const paras=Array.from(doc.getElementsByTagName('w:p')).map(pEl=>
+    Array.from(pEl.getElementsByTagName('w:t')).map(t=>t.textContent).join('')
+  );
+  return paras.join('\n');
+}
+function evNormDigits(t){
+  return String(t||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+}
+// بيطلّع من نص الخطاب: رقم الصادر - تاريخ الصادر (يوم/شهر/سنة) - الموضوع
+function evParseActionDoc(raw){
+  const t=evNormDigits(raw).replace(/\r/g,'');
+  const lines=t.split('\n').map(x=>x.trim()).filter(Boolean);
+  // رقم الصادر (مش شرط يكون موجود): كلمة "رقم/الرقم/صادر" ثم رقم - أو رقم لوحده في أول سطور الخطاب (فوق خط التاريخ)
+  let m=t.match(/(?:رقم\s*الصادر|صادر\s*رقم|الصادر\s*رقم|الرقم\s*الصادر|رقم\s*صادر)\s*[:：\-–]?\s*\(?\s*(\d+(?:\s*[\/\-]\s*\d+)?)/)
+    || t.match(/(?:^|\n)\s*(?:الرقم|رقم)\s*[:：]?\s*\(?\s*(\d+(?:\s*[\/\-]\s*\d+)?)/)
+    || t.match(/رقم\s*\(\s*(\d+)\s*\)/);
+  let outNum=m?m[1].replace(/\s+/g,''):'';
+  if(!outNum){
+    const top=lines.slice(0,6).find(l=>/^\(?\s*\d{1,6}(\s*[\/\-]\s*\d{1,4})?\s*\)?$/.test(l));
+    if(top) outNum=top.replace(/[()\s]/g,'');
+  }
+  // تاريخ الصادر (مش شرط): يوم/شهر/سنة، أو سنة-شهر-يوم، أو "٢٥ سبتمبر ٢٠٢٦"
+  const toISO=(d,mo,y)=>{ d=+d; mo=+mo; y=+y; if(mo<1||mo>12||d<1||d>31||y<1990||y>2100) return ''; return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0'); };
+  const MONTHS={'يناير':1,'فبراير':2,'مارس':3,'أبريل':4,'ابريل':4,'مايو':5,'يونيو':6,'يوليو':7,'أغسطس':8,'اغسطس':8,'سبتمبر':9,'أكتوبر':10,'اكتوبر':10,'نوفمبر':11,'ديسمبر':12};
+  const numDate=(str)=>{
+    let x=str.match(/(\d{1,2})\s*[\/\-\.]\s*(\d{1,2})\s*[\/\-\.]\s*(\d{4})/); if(x) return toISO(x[1],x[2],x[3]);
+    x=str.match(/(\d{4})\s*[\/\-\.]\s*(\d{1,2})\s*[\/\-\.]\s*(\d{1,2})/); if(x) return toISO(x[3],x[2],x[1]);
+    x=str.match(/(\d{1,2})\s+(يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر)\s+(\d{4})/); if(x) return toISO(x[1],MONTHS[x[2]],x[3]);
+    return '';
+  };
+  let outDate='';
+  const lab=t.match(/(?:بتاريخ|التاريخ|تحريرًا في|تحريرا في)\s*[:：]?\s*([^\n]{0,40})/);
+  if(lab) outDate=numDate(lab[1]);
+  if(!outDate) outDate=numDate(lines.slice(0,10).join('\n'));
+  if(!outDate) outDate=numDate(t);
+  // الموضوع: سطر "الموضوع/بشأن/بخصوص" - وإلا أول "بشأن" في نص الخطاب لحد نهاية الجملة
+  let subject='';
+  const sm=t.match(/(?:^|\n)\s*(?:الموضوع|بشأن|بخصوص)\s*[:：\-–]?\s*([^\n]{3,220})(?:\n([^\n]{3,120}))?/);
+  if(sm){
+    subject=sm[1].trim();
+    if(subject.length<40 && sm[2] && !/^(السيد|السادة|تحية|وبعد|عناية)/.test(sm[2].trim())) subject+=' '+sm[2].trim();
+  } else {
+    const bm=t.match(/(?:بشأن|بخصوص)\s*[:：\-–]?\s*([^\n\.]{5,200})/);
+    if(bm) subject=bm[1].trim();
+  }
+  subject=subject.replace(/\s{2,}/g,' ');
+  return {outNum,outDate,subject};
+}
+async function evActFromFile(inp){
+  const f=inp.files&&inp.files[0]; inp.value='';
+  if(!f) return;
+  const msg=document.getElementById('evEdit_msg');
+  const warn=(h)=>{ msg.innerHTML='<span style="color:#b9770e">'+h+'</span>'; };
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext!=='docx' && ext!=='txt'){ warn('⚠️ ارفعي ملف Word بصيغة .docx (الصيغ التانية زي PDF و .doc مش مدعومة هنا).'); return; }
+  msg.innerHTML='⏳ جاري قراءة الملف...';
+  try{
+    const text = ext==='txt' ? await f.text() : await evReadDocxText(f);
+    if(!text || text.trim().length<10){ warn('⚠️ مفيش نص واضح في الملف - اكتبي الإجراء يدويًا.'); return; }
+    const d=evParseActionDoc(text);
+    if(!d.outNum && !d.outDate && !d.subject){ warn('⚠️ ملقيتش رقم صادر ولا تاريخ ولا موضوع في الملف - اكتبيهم يدويًا.'); return; }
+    const c=document.getElementById('evEdit_actions_container');
+    // نفس الخطاب اترفع قبل كده في الإجراء ده (نفس رقم وتاريخ الصادر) - مانكررهوش
+    if(d.outNum && Array.from(c.querySelectorAll('.evEdit_action_row')).some(r=>(r.querySelector('.evEdit_outNum')?.value||'').trim()===d.outNum && (r.querySelector('.evEdit_outDate')?.value||'')===d.outDate)){
+      warn('ℹ️ الخطاب ده (صادر '+escapeHtml(d.outNum)+') متسجّل بالفعل في إجراء فوق.'); return;
+    }
+    let row=Array.from(c.querySelectorAll('.evEdit_action_row')).find(r=>!(r.querySelector('.evEdit_action')?.value||'').trim());
+    if(!row){ addActionRow('evEdit'); const rows=c.querySelectorAll('.evEdit_action_row'); row=rows[rows.length-1]; }
+    const hi=(el,v)=>{ if(el && v){ el.value=v; el.style.background='#fffbe6'; } };
+    hi(row.querySelector('.evEdit_action'), d.subject);
+    hi(row.querySelector('.evEdit_outNum'), d.outNum);
+    hi(row.querySelector('.evEdit_outDate'), d.outDate);
+    const by=row.querySelector('.evEdit_actionBy'); const who=((_evEditCurrent&&_evEditCurrent.receiver)||'').trim()||CU?.name; if(by && !by.value && who) by.value=who;
+    autoDetectActionStatus('evEdit');
+    const got=[d.subject&&'الإجراء',d.outNum&&'رقم الصادر',d.outDate&&'تاريخ الصادر'].filter(Boolean).join(' + ');
+    msg.innerHTML='<span style="color:#1e8449">✅ اتملى من الملف: '+got+' (الخانات الملوّنة) - راجعيها قبل الحفظ.</span>'+((!d.outNum||!d.outDate)?'<br><span style="color:#6c757d;font-size:11px">('+[!d.outNum&&'رقم الصادر',!d.outDate&&'تاريخ الصادر'].filter(Boolean).join(' و')+' مش مكتوب في الخطاب - عادي، سيبيه فاضي أو اكتبيه لو عندك.)</span>':'');
+  }catch(e){ warn('⚠️ مقدرتش أقرا الملف: '+escapeHtml(e.message||'')+' - اكتبي الإجراء يدويًا.'); }
+}
+function evSetEditModalActionMode(on){
+  window._evActionMode=!!on;
+  const mf=document.getElementById('evEdit_mainFields'); if(mf) mf.style.display = on ? 'none' : '';
+  const sb=document.getElementById('evEditSaveBtn'); if(sb) sb.textContent = on ? '💾 حفظ الإجراء' : '💾 حفظ التعديل';
+  const bx=document.getElementById('evEditBox'); if(bx) bx.style.maxWidth = on ? '780px' : '520px';
+  const sm=document.getElementById('evEdit_summary');
+  if(sm){
+    const r=_evEditCurrent;
+    if(on && r){
+      const c=(t)=>t?`<span class="evc-chip">${t}</span>`:'';
+      sm.style.display='block';
+      sm.innerHTML=`<div style="background:#eef5fb;border:1px solid #c9dff0;border-right:5px solid var(--p);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:3px">الوارد اللي بتسجّلي عليه الإجراء</div>
+        <div style="font-size:14px;font-weight:700;color:#2c3e50;line-height:1.6">${escapeHtml(r.subject||'—')}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:11px">
+          ${c(r.evType?('📄 '+escapeHtml(r.evType)):'')}${c('# '+escapeHtml(String(r.inNum||'—')))}${c('📅 '+escapeHtml(r.inDateRaw||'—'))}
+          ${c(r.source==='org'?('🏢 '+escapeHtml(r.name||'—')):(r.orgNameGuess?('🏢 '+escapeHtml(r.orgNameGuess)):''))}
+          ${c(r.sender?('من: '+escapeHtml(r.sender)):'')}${c(r.receiver?('المستلم: '+escapeHtml(r.receiver)):'')}${c(r.dept?('الإدارة: '+escapeHtml(r.dept)):'')}
+        </div></div>`;
+    } else { sm.style.display='none'; sm.innerHTML=''; }
+  }
+  const t=document.getElementById('evEditTitle'); if(t) t.textContent = on ? '➕ إضافة إجراء' : '✏️ تعديل الحدث';
+  ['evEdit_subject','evEdit_type','evEdit_dept','evEdit_sender','evEdit_inNum','evEdit_inDate','evEdit_eventDate','evEdit_receiver'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    if(on){ el.setAttribute('readonly','readonly'); el.style.background='#f0f4f8'; el.style.color='var(--muted)'; }
+    else if(id!=='evEdit_sender'){ el.removeAttribute('readonly'); el.style.background=''; el.style.color=''; }
+  });
+}
 function canEditEventRow(r){
   if(!CU) return false;
   const isAdmin = CU.role==='admin' || CU.action==='admin';
@@ -8932,10 +9219,13 @@ async function evEditGoToFixedData(orgId){
     loadFixedForm(orgId, full.OrgName||'', full.OrgType||'', (full.RegNum||'')+'/'+(full.RegYear||''));
   }catch(e){ alert('تعذّر فتح بيانات الجمعية: '+e.message); }
 }
-function openEventEditModal(idx){
+function openEventEditModal(idx,mode){
   const r=(window._currentEventSearchRows||[])[idx];
   if(!r||!r.id){showMsg('تعذّر تحديد الحدث','error');return;}
-  if(!canEditEventRow(r)){showMsg('غير مسموح - التعديل مقصور على من قام بتسجيل هذا الحدث من الإدارة المختصة وله صلاحية تعديل','error');return;}
+  const actionMode = mode==='action';
+  if(actionMode){
+    if(!canAddActionToEvent(r)){showMsg('غير مسموح - إضافة الإجراء مقصورة على موظفي الإدارة المختصة بهذا الحدث','error');return;}
+  } else if(!canEditEventRow(r)){showMsg('غير مسموح - التعديل مقصور على من قام بتسجيل هذا الحدث من الإدارة المختصة وله صلاحية تعديل','error');return;}
   _evEditCurrent=r;
   // (جديد) لو الحدث خاص بجمعية فعلية، بيظهر زرار لتعديل بياناتها الثابتة كاملة (اسم، رقم
   // قيد، محافظة...) من نفس مكان تعديل الحدث - نفس شاشة "تعديل البيانات الثابتة" التاريخية
@@ -8988,6 +9278,16 @@ function openEventEditModal(idx){
     evDateWrap.style.display='none';
   }
   document.getElementById('evEdit_msg').textContent='';
+  evSetEditModalActionMode(actionMode);
+  if(actionMode){
+    const fb=document.getElementById('evEditFixedDataBtnWrap'); if(fb) fb.innerHTML='';
+    toggleActionsBlock('evEdit',true);
+    document.querySelectorAll('#evEdit_actions_container .evEdit_actionBy').forEach(el=>{ const who=(r.receiver||'').trim()||CU?.name; if(!el.value && who) el.value=who; });
+    document.querySelectorAll('#evEdit_actions_container .evEdit_action').forEach(el=>{ if(!el.value) el.placeholder='اكتبي الإجراء على: '+((r.subject||'').slice(0,70)); });
+    if(evPendingDecree(r)){
+      document.getElementById('evEdit_msg').innerHTML='<span style="color:#b9770e">⏳ الوارد نوعه "قرار": اختاري نوع القرار واكتبي رقم القرار وتاريخه في البيانات الإدارية.</span>';
+    }
+  }
   document.getElementById('eventEditModal').classList.add('show');
 }
 function closeEventEditModal(){
@@ -9119,6 +9419,15 @@ async function saveEventEdit(){
     payload.EventDate=document.getElementById('evEdit_eventDate').value||null;
   }
   if(!payload.Subject){msg.innerHTML='<span style="color:#c0392b">أدخل الموضوع</span>';return;}
+  // (جديد) وارد نوعه "قرار" في التشريعات: لو اختارت نوع قرار (غير حل الجمعية) لازم رقم القرار
+  if(window._evActionMode && r.source==='org' && r.evType==='قرار' && r.dept==='التشريعات'){
+    const lt=document.getElementById('evEditAdm_lg_type')?.value||'';
+    const ln=(document.getElementById('evEditAdm_lg_number')?.value||'').trim();
+    if(lt && lt!=='حل الجمعية' && !ln){
+      msg.innerHTML='<span style="color:#c0392b">⚠️ اكتبي رقم القرار - الوارد ده نوعه "قرار". (أو سيبي نوع القرار فاضي وهيفضل بانتظار رقم القرار)</span>';
+      return;
+    }
+  }
   // (جديد) البيانات الإدارية بتتحفظ دايمًا في إحصاء إدارتها بشكل طبيعي، وكمان بتتضاف
   // تلقائيًا كـ"إجراء" جوه الحدث - إجراء 1 لو مفيش إجراء حقيقي، أو إجراء 2 لو فيه، بنفس
   // منطق "تسجيل آخر حدث" بالظبط.
@@ -9132,8 +9441,15 @@ async function saveEventEdit(){
   }
   msg.textContent='⏳ جاري الحفظ...';
   try{
-    const endpoint=r.source==='org' ? ('/events/'+r.id) : ('/other-party-events/'+r.id);
-    await apiCall('PUT',endpoint,payload);
+    let endpoint=r.source==='org' ? ('/events/'+r.id) : ('/other-party-events/'+r.id);
+    let body=payload;
+    if(window._evActionMode){
+      // وضع "إضافة إجراء": بنبعت بس الإجراءات/الحالة/المستند/هام-عاجل - بيانات الوارد نفسها متتغيّرش
+      endpoint+='/action';
+      body={Actions:payload.Actions,Status:payload.Status,IsImportant:payload.IsImportant,IsUrgent:payload.IsUrgent,FilePath:payload.FilePath,
+        RequesterID:payload.RequesterID,RequesterName:payload.RequesterName,RequesterDept:payload.RequesterDept,RequesterAction:payload.RequesterAction,RequesterRole:payload.RequesterRole};
+    }
+    await apiCall('PUT',endpoint,body);
     msg.innerHTML='<span style="color:#1e8449">✅ تم الحفظ</span>';
     setTimeout(()=>{ closeEventEditModal(); doSearch(); },500);
   }catch(e){

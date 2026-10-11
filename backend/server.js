@@ -2286,6 +2286,30 @@ app.put('/api/events/:id',async(req,res)=>{try{
   res.json({ok:true});
 }catch(e){res.status(500).json({error:e.message});}});
 
+// ══ (جديد) إضافة إجراء على وارد موجود - موظف الإدارة المختصة بالحدث (Department) أو المدير ══
+// مؤقتًا: الصلاحية = نفس إدارة الحدث + صلاحية "edit". مابتعدّلش أي بيانات للوارد نفسه (رقم/تاريخ/موضوع/نوع/مرسل/مستلم)،
+// بتعدّل بس: الإجراءات، الحالة، هام/عاجل، المستند. فحص تكرار رقم الصادر شغال زي PUT /api/events/:id بالظبط.
+app.put('/api/events/:id/action',async(req,res)=>{try{
+  const d=req.body||{};
+  const database=await db();
+  const evR=await database.request().input('id',sql.Int,req.params.id)
+    .query('SELECT EventID,OrgID,Department FROM OrgEvents WHERE EventID=@id AND ISNULL(IsDeleted,0)=0');
+  if(!evR.recordset.length) return res.status(404).json({error:'الحدث غير موجود'});
+  const ev=evR.recordset[0];
+  const isAdmin = d.RequesterRole==='admin' || d.RequesterAction==='admin';
+  const sameDept = d.RequesterDept && d.RequesterDept===ev.Department && d.RequesterAction==='edit';
+  if(!isAdmin && !sameDept) return res.status(403).json({error:'غير مسموح - إضافة الإجراء مقصورة على موظفي الإدارة المختصة بهذا الحدث'});
+  const outDup=await checkOutgoingNumDuplicate(database,{orgId:ev.OrgID,actions:d.Actions,excludeEventId:ev.EventID});
+  if(outDup) return res.status(409).json({error:`رقم الصادر (${outDup.outNum}) بتاريخ (${outDup.outDate}) مسجَّل بالفعل ضمن إجراءات حدث آخر لنفس الجمعية - لا يجوز تسجيله مرة أخرى`});
+  await database.request().input('id',sql.Int,req.params.id)
+    .input('st',sql.NVarChar,d.Status||'جاري العمل')
+    .input('imp',sql.Bit,d.IsImportant?1:0).input('urg',sql.Bit,d.IsUrgent?1:0)
+    .input('ac',sql.NVarChar,d.Actions?JSON.stringify(d.Actions):null)
+    .input('fp',sql.NVarChar,d.FilePath||null)
+    .query('UPDATE OrgEvents SET Status=@st,IsImportant=@imp,IsUrgent=@urg,Actions=@ac,FilePath=@fp WHERE EventID=@id');
+  res.json({ok:true});
+}catch(e){res.status(500).json({error:e.message});}});
+
 // ── حذف سجل "آخر حدث" بسبب - نفس قاعدة التعديل بالظبط (المدير، أو مين سجّله وعنده صلاحية إدارته) ──
 app.delete('/api/events/:id',async(req,res)=>{try{
   const reason=(req.body&&req.body.reason||'').trim();
@@ -3055,6 +3079,27 @@ app.put('/api/other-party-events/:id',async(req,res)=>{try{
   if(/duplicate key|UNIQUE KEY constraint/i.test(e.message)) return res.status(409).json({error:'⚠️ هذا الحدث مسجَّل بالفعل (نفس الاسم + رقم الوارد + التاريخ)'});
   res.status(500).json({error:e.message});
 }});
+
+// ══ (جديد) إضافة إجراء على وارد "جهة أخرى" - نفس قاعدة /api/events/:id/action (إدارة الحدث أو المدير) ══
+app.put('/api/other-party-events/:id/action',async(req,res)=>{try{
+  const d=req.body||{};
+  const database=await db();
+  const evR=await database.request().input('id',sql.Int,req.params.id)
+    .query('SELECT EventID,Department,RecordedDept FROM OtherPartyEvents WHERE EventID=@id AND ISNULL(IsDeleted,0)=0');
+  if(!evR.recordset.length) return res.status(404).json({error:'الحدث غير موجود'});
+  const ev=evR.recordset[0];
+  const evDept=ev.Department||ev.RecordedDept;
+  const isAdmin = d.RequesterRole==='admin' || d.RequesterAction==='admin';
+  const sameDept = d.RequesterDept && d.RequesterDept===evDept && d.RequesterAction==='edit';
+  if(!isAdmin && !sameDept) return res.status(403).json({error:'غير مسموح - إضافة الإجراء مقصورة على موظفي الإدارة المختصة بهذا الحدث'});
+  await database.request().input('id',sql.Int,req.params.id)
+    .input('st',sql.NVarChar,d.Status||'جاري العمل')
+    .input('imp',sql.Bit,d.IsImportant?1:0).input('urg',sql.Bit,d.IsUrgent?1:0)
+    .input('ac',sql.NVarChar,d.Actions?JSON.stringify(d.Actions):null)
+    .input('fp',sql.NVarChar,d.FilePath||null)
+    .query('UPDATE OtherPartyEvents SET Status=@st,IsImportant=@imp,IsUrgent=@urg,Actions=@ac,FilePath=@fp WHERE EventID=@id');
+  res.json({ok:true});
+}catch(e){res.status(500).json({error:e.message});}});
 
 // ── حذف حدث "جهة أخرى" - نفس منطق حذف حدث الجمعية بالظبط: سبب إجباري، ومسموح فقط
 // للمدير العام، أو لمن سجّل الحدث بنفسه (بالاسم + إدارته وقت التسجيل) وله صلاحية "تعديل".
